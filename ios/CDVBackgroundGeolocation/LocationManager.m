@@ -259,6 +259,14 @@ enum {
 }
 
 /**
+ * Called by js to push a notification
+ */
+- (void) pushNotification
+{
+   [self notify:@"XD!!!"];
+}
+
+/**
  * toggle between foreground and background operation mode
  */
 - (void) switchMode:(BGOperationMode)mode
@@ -467,11 +475,11 @@ enum {
 {
     DDLogInfo(@"LocationManager#sync %@", location);
     if (_config.isDebugging) {
-        [self notify:[NSString stringWithFormat:@"Location update: %s\nSPD: %0.0f | DF: %ld | ACY: %0.0f",
+        [self notify:[NSString stringWithFormat:@"Location update: %s\nSPD: %0.0f | DF: %ld | COORD: %ld",
             ((operationMode == FOREGROUND) ? "FG" : "BG"),
             [location.speed doubleValue],
             (long) locationManager.distanceFilter,
-            [location.accuracy doubleValue]
+            (long) _config.coordenates
         ]];
 
         AudioServicesPlaySystemSound (locationSyncSound);

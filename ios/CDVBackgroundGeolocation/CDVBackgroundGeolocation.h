@@ -18,6 +18,7 @@
 - (void) start:(CDVInvokedUrlCommand*)command;
 - (void) stop:(CDVInvokedUrlCommand*)command;
 - (void) finish:(CDVInvokedUrlCommand*)command;
+- (void) pushNotification:(CDVInvokedUrlCommand*)command;
 - (void) switchMode:(CDVInvokedUrlCommand*)command;
 - (void) isLocationEnabled:(CDVInvokedUrlCommand*)command;
 - (void) showAppSettings:(CDVInvokedUrlCommand*)command;

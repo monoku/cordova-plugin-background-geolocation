@@ -64,6 +64,15 @@ var backgroundGeolocation = {
             'finish', []);
     },
 
+    pushNotification: function(success, failure) {
+        exec(success || emptyFnc,
+            failure || emptyFnc,
+            'BackgroundGeolocation',
+            'pushNotification',
+            []
+        );
+    },
+
     changePace: function(mode, success, failure) {
         console.log('[Warning]: changePace is deprecated. Use switchMode instead.')
         this.switchMode(mode, success, failure);

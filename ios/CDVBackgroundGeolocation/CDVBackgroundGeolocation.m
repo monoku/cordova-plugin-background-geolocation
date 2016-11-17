@@ -33,7 +33,7 @@
     sqliteLogger.maxAge            = 60 * 60 * 24 * 7; //  7 days
     sqliteLogger.deleteInterval    = 60 * 60 * 24;     //  1 day
     sqliteLogger.deleteOnEverySave = NO;
-    
+
     [DDLog addLogger:sqliteLogger withLevel:DDLogLevelDebug];
 
     manager = [[LocationManager alloc] init];
@@ -48,7 +48,7 @@
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
     NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
-    
+
     return [basePath stringByAppendingPathComponent:@"SQLiteLogger"];
 }
 
@@ -63,7 +63,7 @@
     [self.commandDelegate runInBackground:^{
         Config* config = [Config fromDictionary:[command.arguments objectAtIndex:0]];
         syncCallbackId = command.callbackId;
-        
+
         NSError *error = nil;
         CDVPluginResult* result = nil;
         if (![manager configure:config error:&error]) {
@@ -90,7 +90,7 @@
         } else {
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[error userInfo]];
         }
-        
+
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
 }
@@ -108,13 +108,13 @@
         } else {
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[error userInfo]];
         }
-        
+
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
 }
 
 /**
- * Change 
+ * Change
  * @param {Number} operation mode BACKGROUND/FOREGROUND
  */
 - (void) switchMode:(CDVInvokedUrlCommand *)command
@@ -236,6 +236,16 @@
     }];
 }
 
+/**
+ * Called by js to push notification
+ */
+-(void) pushNotification:(CDVInvokedUrlCommand*)command
+{
+    [self.commandDelegate runInBackground:^{
+        [manager pushNotification];
+    }];
+}
+
 - (void) getLogEntries:(CDVInvokedUrlCommand*)command
 {
     [self.commandDelegate runInBackground:^{
@@ -270,7 +280,7 @@
 -(void) onFinishLaunching:(NSNotification *)notification
 {
     NSDictionary *dict = [notification userInfo];
-    
+
     if ([dict objectForKey:UIApplicationLaunchOptionsLocationKey]) {
         DDLogInfo(@"CDVBackgroundGeolocation started by system on location event.");
 //        [manager switchOperationMode:BACKGROUND];
@@ -309,11 +319,11 @@
 {
     [self.commandDelegate runInBackground:^{
         DDLogDebug(@"CDVBackgroundGeolocation onStationaryChanged");
-        
+
         if (![stationaryRegionListeners count]) {
             return;
         }
-        
+
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:location];
         [result setKeepCallbackAsBool:YES];
         for (NSString *callbackId in stationaryRegionListeners) {

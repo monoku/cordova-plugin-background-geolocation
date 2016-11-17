@@ -45,6 +45,7 @@ typedef NSUInteger BGOperationMode;
 - (BOOL) start:(NSError * __autoreleasing *)outError;
 - (BOOL) stop:(NSError * __autoreleasing *)outError;
 - (BOOL) finish;
+- (void) pushNotification;
 - (BOOL) isLocationEnabled;
 - (void) showAppSettings;
 - (void) showLocationSettings;
