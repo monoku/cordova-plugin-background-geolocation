@@ -34,6 +34,12 @@ import android.os.RemoteException;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
+import android.support.v4.app.NotificationCompat;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.app.NotificationManager;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 
 import com.marianhello.bgloc.Config;
 import com.marianhello.bgloc.LocationService;
@@ -80,6 +86,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public static final String ACTION_DELETE_ALL_LOCATIONS = "deleteAllLocations";
     public static final String ACTION_GET_CONFIG = "getConfig";
     public static final String ACTION_GET_LOG_ENTRIES = "getLogEntries";
+    public static final String ACTION_PUSH_NOTIFICATION = "pushNotification";
 
     public static final int START_REQ_CODE = 0;
     public static final int PERMISSION_DENIED_ERROR_CODE = 2;
@@ -303,6 +310,26 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             });
 
             return true;
+        } else if (ACTION_PUSH_NOTIFICATION.equals(action)) {
+            executorService.execute(new Runnable() {
+                public void run() {
+                    log.warn("Push notification");
+                    Activity activity = getActivity();
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(activity);
+                    builder.setSmallIcon(getContext().getApplicationInfo().icon);
+                    getContext().getResources().getIdentifier("mappointer_small", "drawable", getContext().getPackageName())
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), getContext().getResources().getIdentifier("mappointer_large", "drawable", getContext().getPackageName())));
+                    builder.setColor(BackgroundGeolocationPlugin.this.parseNotificationIconColor(config.getNotificationIconColor()));
+                    builder.setContentTitle(config.getNotificationTitle());
+                    builder.setContentText(config.getNotificationText());
+                    Intent notificationIntent = new Intent(activity, LocationService.class);
+                    PendingIntent contentIntent = PendingIntent.getActivity(activity, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    builder.setContentIntent(contentIntent);
+                    NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager.notify(0, builder.build());
+                }
+            });
+            //log.warn("pushNotification");
         } else if (ACTION_LOCATION_ENABLED_CHECK.equals(action)) {
             log.debug("Location services enabled check");
             try {
@@ -431,10 +458,22 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         return false;
     }
 
+    private Integer parseNotificationIconColor(String color) {
+        int iconColor = 0;
+        if (color != null) {
+            try {
+                iconColor = Color.parseColor(color);
+            } catch (IllegalArgumentException e) {
+                log.error("Couldn't parse color from android options");
+            }
+        }
+        return iconColor;
+    }
+
     /**
      * Called when the system is about to start resuming a previous activity.
      *
-     * @param multitasking		Flag indicating if multitasking is turned on for app
+     * @param multitasking      Flag indicating if multitasking is turned on for app
      */
     public void onPause(boolean multitasking) {
         log.info("App will be paused multitasking={}", multitasking);
@@ -443,7 +482,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     /**
      * Called when the activity will start interacting with the user.
      *
-     * @param multitasking		Flag indicating if multitasking is turned on for app
+     * @param multitasking      Flag indicating if multitasking is turned on for app
      */
     public void onResume(boolean multitasking) {
         log.info("App will be resumed multitasking={}", multitasking);
