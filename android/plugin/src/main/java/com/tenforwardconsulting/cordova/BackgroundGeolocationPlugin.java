@@ -317,7 +317,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
                     Activity activity = getActivity();
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(activity);
                     builder.setSmallIcon(getContext().getApplicationInfo().icon);
-                    getContext().getResources().getIdentifier("mappointer_small", "drawable", getContext().getPackageName())
+                    getContext().getResources().getIdentifier("mappointer_small", "drawable", getContext().getPackageName());
                     builder.setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), getContext().getResources().getIdentifier("mappointer_large", "drawable", getContext().getPackageName())));
                     builder.setColor(BackgroundGeolocationPlugin.this.parseNotificationIconColor(config.getNotificationIconColor()));
                     builder.setContentTitle(config.getNotificationTitle());
